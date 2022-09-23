@@ -7,9 +7,16 @@ from math import *
 # INITIALIZATIONS
 hub = PrimeHub()
 motor_pair = MotorPair('C', 'A')
+motor_pair.set_motor_rotation(1.07 * math.pi, 'cm')
+distance = DistanceSensor('E')
+obstacle_detector = DistanceSensor('E')
 sen_1 = ColorSensor("B")
 sen_2 = ColorSensor("D")
 sen_3 = ColorSensor("F")
+
+# Sensor F = Derecho
+# Sensor B = Izquierdo
+# Sensor D = Medio
 
 # MATRIXES
 H = 9
@@ -100,27 +107,53 @@ buscar = [
 def avanzar(veli,veld):
     motor_pair.start_tank(veli,veld)
 
-def girar_90_der():
+def girar_45_der():
     hub.motion_sensor.reset_yaw_angle()
-    while (hub.motion_sensor.get_yaw_angle() < 88):
+    while (hub.motion_sensor.get_yaw_angle() < 45):
         motor_pair.start_tank(40, -35)
     motor_pair.start_tank(0, 0)
     hub.motion_sensor.reset_yaw_angle()
 
-def girar_90_izq():
+def girar_45_izq():
     hub.motion_sensor.reset_yaw_angle()
-    while (hub.motion_sensor.get_yaw_angle() < -90):
+    while (hub.motion_sensor.get_yaw_angle() < -45):
         motor_pair.start_tank(-35, 40)
     motor_pair.start_tank(0, 0)
     hub.motion_sensor.reset_yaw_angle()
 
+def girar_90_der():
+    girar_45_der()
+    girar_45_der()
+
+def girar_90_izq():
+    girar_45_izq()
+    girar_45_izq()
+
 def girar_180_der():
-    girar_90_der()
-    girar_90_der()
+    girar_45_der()
+    girar_45_der()
+    girar_45_der()
+    girar_45_der()
 
 def girar_180_izq():
-    girar_90_izq()
-    girar_90_izq()
+    girar_45_izq()
+    girar_45_izq()
+    girar_45_izq()
+    girar_45_izq()
+
+def girar_num_grados_der(num):
+    hub.motion_sensor.reset_yaw_angle()
+    while (hub.motion_sensor.get_yaw_angle() < num):
+        motor_pair.start_tank(40, -35)
+    motor_pair.start_tank(0, 0)
+    hub.motion_sensor.reset_yaw_angle()
+
+def girar_num_grados_izq(num):
+    hub.motion_sensor.reset_yaw_angle()
+    while (hub.motion_sensor.get_yaw_angle() < num):
+        motor_pair.start_tank(-35, 40)
+    motor_pair.start_tank(0, 0)
+    hub.motion_sensor.reset_yaw_angle()
 
 def sound_emitter(num):
     for i in range(num):
@@ -134,32 +167,20 @@ def green_verification():
     Gcolor_3 = sen_3.get_color()
     if (Gcolor_1 == 'green'):
         hub.light_matrix.show_image('HAPPY')
-        motor_pair.move_tank(0.5, 'cm', 0, 10)
-        if (Gcolor_1 == 'green'):
-            if (Gcolor_1 == 'green') and (Gcolor_3 == 'green'):
-                girar_180_der()
-                hub.motion_sensor.reset_yaw_angle()
-                while (hub.motion_sensor.get_yaw_angle() < 40):
-                    motor_pair.start_tank(40, -35)
-                motor_pair.start_tank(0, 0)
-                hub.motion_sensor.reset_yaw_angle()
-                motor_pair.move_tank(2,'cm',10, 10)
-            elif (Gcolor_1 == 'green') and (Gcolor_3 != 'green'):
-                motor_pair.move_tank(1.5, 'cm', 0, 10)
-                girar_90_izq()
+        motor_pair.move_tank(2, 'cm', 0, 10)
+        if (Gcolor_1 == 'green') and (Gcolor_3 == 'green'):
+            girar_180_der()
+        elif (Gcolor_1 == 'green') and (Gcolor_3 != 'green'):
+            motor_pair.move_tank(3, 'cm', -15, 50)
+            girar_45_izq()
     elif (Gcolor_3 == 'green'):
-        motor_pair.move_tank(0.5, 'cm',10, 0)
-        if (Gcolor_3 == 'green'):
-            if (Gcolor_1 == 'green') and (Gcolor_3 == 'green'):
-                girar_180_izq()
-                hub.motion_sensor.reset_yaw_angle()
-                while (hub.motion_sensor.get_yaw_angle() < 40):
-                    motor_pair.start_tank(-35, 40)
-                motor_pair.start_tank(0, 0)
-                hub.motion_sensor.reset_yaw_angle()
-            elif (Gcolor_3 == 'green') and (Gcolor_1 != 'green'):
-                motor_pair.move_tank(1.5, 'cm', 0, 10)
-                girar_90_der()
+        motor_pair.move_tank(2, 'cm',10, 0)
+        if (Gcolor_1 == 'green') and (Gcolor_3 == 'green'):
+            motor_pair.move_tank(20,'cm',10, 10)
+            girar_180_izq()
+        elif (Gcolor_3 == 'green') and (Gcolor_1 != 'green'):
+            motor_pair.move_tank(3, 'cm', 50, -15)
+            girar_45_der()
 
 def double_black():
     color_1 = sen_1.get_reflected_light()
@@ -169,12 +190,37 @@ def double_black():
         motor_pair.move_tank(2, 'cm', 20, 20)
         green_verification()
 
+def obstacle_detection():
+    dist_cm = get_distance()
+    color_3 = sen_3.get_reflected_light()
+    if ((dist_cm) < 4.5):
+        motor_pair.move_tank(4, 'cm', -10, -10)
+        girar_num_grados_der(80)
+        dist_cm = get_distance()
+        if (dist_cm > 60):
+            hub.light_matrix.show_image('HAPPY')
+            while (color_3 > 35):
+                color_3 = sen_3.get_reflected_light()
+                motor_pair.start_tank(35, 85)
+            motor_pair.start_tank(0, 0)
+        """else:
+            hub.light_matrix.show_image('ANGRY')
+            girar_num_grados_izq(-80)"""
+
+def get_distance():
+    dist_cm = obstacle_detector.get_distance_cm()
+    if (dist_cm == None):
+        dist_cm = 200
+    return dist_cm
+
+
 while True:
     color_1 = sen_1.get_reflected_light()
     color_2 = sen_2.get_reflected_light()
     color_3 = sen_3.get_reflected_light()
     Gcolor_1 = sen_1.get_color()
     Gcolor_3 = sen_3.get_color()
+    dist_cm = get_distance()
 
     # LINE FOLLOWER
     if Gcolor_1 == 'green' or Gcolor_3 == 'green':
@@ -182,9 +228,11 @@ while True:
     elif (color_1 < 30) and (color_3 < 30):
         double_black()
     elif (color_3 < 30):
-        motor_pair.start_tank(40,-25)
+        motor_pair.start_tank(40, -25)
         double_black()
     elif (color_1 < 30):
         motor_pair.start_tank(-25,40)
+    elif (dist_cm < 10):
+        obstacle_detection()
     else:
         motor_pair.start_tank(100,100)
