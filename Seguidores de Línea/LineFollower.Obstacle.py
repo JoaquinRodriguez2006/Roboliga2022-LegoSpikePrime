@@ -209,8 +209,6 @@ def obstacle_detection():
             girar_num_grados_der(40)
         else:
             hub.light_matrix.show_image('ANGRY')
-            girar_num_grados_der(39)
-            girar_num_grados_der(39)
             hub.motion_sensor.reset_yaw_angle()
             angle = hub.motion_sensor.get_yaw_angle()
             print("Angulo:", angle)
