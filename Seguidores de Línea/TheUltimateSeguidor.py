@@ -2,6 +2,7 @@ from spike import PrimeHub, LightMatrix, Button, StatusLight, ForceSensor, Motio
 from spike.control import wait_for_seconds, wait_until, Timer
 import hub as advancedHub
 import math
+import random
 from math import *
 
 # INITIALIZATIONS
@@ -193,16 +194,22 @@ def double_black():
 def obstacle_detection():
     dist_cm = get_distance()
     color_3 = sen_3.get_reflected_light()
-    if ((dist_cm) < 4.5):
+    if ((dist_cm) < 7):
+        hub.light_matrix.show_image('HAPPY')
         motor_pair.move_tank(4, 'cm', -10, -10)
-        girar_num_grados_der(80)
+        girar_num_grados_der(90)
+        motor_pair.move_tank(2, 'cm', 10, 10)
         dist_cm = get_distance()
         if (dist_cm > 60):
             hub.light_matrix.show_image('HAPPY')
-            while (color_3 > 35):
+            while (color_3 > 60):
                 color_3 = sen_3.get_reflected_light()
                 motor_pair.start_tank(35, 85)
             motor_pair.start_tank(0, 0)
+            motor_pair.move_tank(3, 'cm', 10, 10)
+            girar_90_der()
+        else:
+            hub.light_matrix.show_image('ANGRY')
         """else:
             hub.light_matrix.show_image('ANGRY')
             girar_num_grados_izq(-80)"""
@@ -212,7 +219,6 @@ def get_distance():
     if (dist_cm == None):
         dist_cm = 200
     return dist_cm
-
 
 while True:
     color_1 = sen_1.get_reflected_light()
