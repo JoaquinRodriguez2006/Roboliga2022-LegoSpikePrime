@@ -322,7 +322,7 @@ def verifica_l_giro():
                 hub.motion_sensor.reset_yaw_angle()
                 while (hub.motion_sensor.get_yaw_angle() < 31):
                     update()
-                    motor_pair.start_tank(50,-50)
+                    motor_pair.start_tank(50, -50)
                     if luz_2 < 35:
                         motor_pair.start_tank(0,0)
                         mostrar(l_izq)
@@ -541,32 +541,58 @@ def loma_burro():
         salida = int(1.5 * proporcional + ki * integral + kd * derivada)
         error_previo = error
 
+def find_line_after_obstacle(direction):
+    color_3 = sen_3.get_reflected_light()
+    color_1 = sen_1.get_reflected_light()
+    if direction == 'right':
+        color_3 = sen_3.get_reflected_light()
+        while (color_3 < 45):
+            color_3 = sen_3.get_reflected_light()
+            motor_pair.start_tank(-10, 10)
+        motor_pair.start_tank(0, 0)
+    
+    elif direction == 'left':
+        color_1 = sen_1.get_reflected_light()
+        while (color_1 < 45):
+            color_1 = sen_1.get_reflected_light()
+            motor_pair.start_tank(10, -10)
+        motor_pair.start_tank(0, 0)
+
 def obstacle_detection():
     dist_cm = get_distance()
     color_3 = sen_3.get_reflected_light()
-    if ((dist_cm) < 6):
+    if ((dist_cm) < 5):
         hub.light_matrix.show_image('HAPPY')
-        motor_pair.move_tank(4.5, 'cm', -10, -10)
+        dist_cm = get_distance()
+        while ((dist_cm) < 10):
+            dist_cm = get_distance()
+            print(dist_cm)
+            motor_pair.start_tank(-10, -10)
+        motor_pair.start_tank(0, 0)
+        motor_pair.move_tank(1, 'cm', -10, -10)
         girar_num_grados_der(80)
         dist_cm = get_distance()
         if (dist_cm > 30):
-            motor_pair.move_tank(2, 'cm', -20, 55)
+            motor_pair.move_tank(2.5, 'cm', -25, 55)
             hub.light_matrix.show_image('HEART')
             timer.reset()
-            while (color_3 > 45):
+            while (color_3 > 50): # Antes estaba en 45
                 color_3 = sen_3.get_reflected_light()
                 motor_pair.start_tank(28, 75)
-                if (timer.now() > 5):
+                if (timer.now() > 4.5):
                     while (color_3 > 45):
                         color_3 = sen_3.get_reflected_light()
-                        motor_pair.start_tank(18, 75)
+                        motor_pair.start_tank(22, 75)
+                        timer.reset()
             motor_pair.start_tank(0, 0)
             hub.light_matrix.show_image('DIAMOND')
+            motor_pair.move_tank(2, 'cm', 30, 30)
             color_1 = sen_1.get_reflected_light()
             while color_1 > 30:
                 color_1 = sen_1.get_reflected_light()
                 motor_pair.start_tank(30, -30)
             motor_pair.start_tank(0, 0)
+            # find_line_after_obstacle('right')
         else:
             hub.light_matrix.show_image('ANGRY')
             hub.motion_sensor.reset_yaw_angle()
@@ -574,17 +600,23 @@ def obstacle_detection():
                 motor_pair.start_tank(-35, 40)
             motor_pair.start_tank(0, 0)
             hub.motion_sensor.reset_yaw_angle()
-            motor_pair.move_tank(2, 'cm', 55, -20)
+            motor_pair.move_tank(3, 'cm', 60, 30)
             timer.reset()
-            while (color_3 > 45):
+            while (color_3 > 50): # Antes estaba en 45
                 color_3 = sen_3.get_reflected_light()
                 motor_pair.start_tank(80, 28)
                 if (timer.now() > 6):
                     while (color_3 > 45):
-                        color_3.get_reflected_light()
-                        motor_pair.start_tank(80, 18)
+                        color_3 = sen_3.get_reflected_light()
+                        motor_pair.start_tank(80, 20) # Antes eran 80/18
             motor_pair.start_tank(0, 0)
-
+            hub.light_matrix.show_image('DIAMOND')
+            motor_pair.move_tank(3, 'cm', 30, 30)
+            color_1 = sen_1.get_reflected_light()
+            while color_1 > 30:
+                color_1 = sen_1.get_reflected_light()
+                motor_pair.start_tank(-30, 30)
+            motor_pair.start_tank(0, 0)
     mostrar(nada)
 
 while True:
