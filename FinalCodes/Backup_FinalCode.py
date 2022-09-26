@@ -30,7 +30,7 @@ sen_3 = ColorSensor("F")
 distancia = DistanceSensor('E')
 
 # AYUDAS
-timer = Timer()
+
 
 # PID
 error = 0
@@ -544,22 +544,18 @@ def loma_burro():
 def obstacle_detection():
     dist_cm = get_distance()
     color_3 = sen_3.get_reflected_light()
+    color_3_c = sen_3.get_color()
     if ((dist_cm) < 6):
         hub.light_matrix.show_image('HAPPY')
         motor_pair.move_tank(4.5, 'cm', -10, -10)
         girar_num_grados_der(80)
         dist_cm = get_distance()
         if (dist_cm > 30):
-            motor_pair.move_tank(2, 'cm', -20, 55)
+            motor_pair.move_tank(2, 'cm', -20, 55)    
             hub.light_matrix.show_image('HEART')
-            timer.reset()
             while (color_3 > 45):
                 color_3 = sen_3.get_reflected_light()
                 motor_pair.start_tank(28, 75)
-                if (timer.now() > 5):
-                    while (color_3 > 45):
-                        color_3 = sen_3.get_reflected_light()
-                        motor_pair.start_tank(18, 75)
             motor_pair.start_tank(0, 0)
             hub.light_matrix.show_image('DIAMOND')
             color_1 = sen_1.get_reflected_light()
@@ -575,14 +571,9 @@ def obstacle_detection():
             motor_pair.start_tank(0, 0)
             hub.motion_sensor.reset_yaw_angle()
             motor_pair.move_tank(2, 'cm', 55, -20)
-            timer.reset()
             while (color_3 > 45):
                 color_3 = sen_3.get_reflected_light()
                 motor_pair.start_tank(80, 28)
-                if (timer.now() > 6):
-                    while (color_3 > 45):
-                        color_3.get_reflected_light()
-                        motor_pair.start_tank(80, 18)
             motor_pair.start_tank(0, 0)
 
     mostrar(nada)
