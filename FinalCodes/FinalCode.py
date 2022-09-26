@@ -547,34 +547,34 @@ def obstacle_detection():
     color_3_c = sen_3.get_color()
     if ((dist_cm) < 6):
         hub.light_matrix.show_image('HAPPY')
-        motor_pair.move_tank(4, 'cm', -10, -10)
+        motor_pair.move_tank(4.5, 'cm', -10, -10)
         girar_num_grados_der(80)
-        motor_pair.move_tank(3, 'cm', -6, 15)
         dist_cm = get_distance()
         if (dist_cm > 30):
+            motor_pair.move_tank(2, 'cm', -20, 55)    
             hub.light_matrix.show_image('HEART')
-            while (color_3 > 50):
+            while (color_3 > 45):
                 color_3 = sen_3.get_reflected_light()
-                motor_pair.start_tank(30, 80)
+                motor_pair.start_tank(28, 75)
             motor_pair.start_tank(0, 0)
-            girar_num_grados_der(40)
+            hub.light_matrix.show_image('DIAMOND')
+            color_1 = sen_1.get_reflected_light()
+            while color_1 > 30:
+                color_1 = sen_1.get_reflected_light()
+                motor_pair.start_tank(30, -30)
+            motor_pair.start_tank(0, 0)
         else:
             hub.light_matrix.show_image('ANGRY')
             hub.motion_sensor.reset_yaw_angle()
-            angle = hub.motion_sensor.get_yaw_angle()
-            print("Angulo:", angle)
             while (hub.motion_sensor.get_yaw_angle() > -159):
                 motor_pair.start_tank(-35, 40)
-                angle = hub.motion_sensor.get_yaw_angle()
-                print("Angulo:", angle)
             motor_pair.start_tank(0, 0)
             hub.motion_sensor.reset_yaw_angle()
-            while (color_3 > 50):
+            motor_pair.move_tank(2, 'cm', 55, -20)
+            while (color_3 > 45):
                 color_3 = sen_3.get_reflected_light()
-                motor_pair.start_tank(80, 26)
+                motor_pair.start_tank(80, 28)
             motor_pair.start_tank(0, 0)
-            motor_pair.move_tank(3, 'cm', 10, -10)
-            girar_num_grados_der(60)
 
     mostrar(nada)
 
