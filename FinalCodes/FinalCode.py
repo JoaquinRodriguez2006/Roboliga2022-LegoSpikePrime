@@ -288,6 +288,13 @@ def girar_num_grados_der(num):
     motor_pair.start_tank(0, 0)
     hub.motion_sensor.reset_yaw_angle()
 
+def giro_ajustable(num, veli, veld):
+    hub.motion_sensor.reset_yaw_angle()
+    while (hub.motion_sensor.get_yaw_angle() < num):
+        motor_pair.start_tank(veli, veld)
+    motor_pair.start_tank(0, 0)
+    hub.motion_sensor.reset_yaw_angle()
+
 def verifica_l_giro():
     manzana = 0
     update()
@@ -550,7 +557,7 @@ def find_line_after_obstacle(direction):
             color_3 = sen_3.get_reflected_light()
             motor_pair.start_tank(-10, 10)
         motor_pair.start_tank(0, 0)
-    
+
     elif direction == 'left':
         color_1 = sen_1.get_reflected_light()
         while (color_1 < 45):
@@ -561,10 +568,10 @@ def find_line_after_obstacle(direction):
 def obstacle_detection():
     dist_cm = get_distance()
     color_3 = sen_3.get_reflected_light()
-    if ((dist_cm) < 5):
+    if ((dist_cm) < 10):
         hub.light_matrix.show_image('HAPPY')
         dist_cm = get_distance()
-        while ((dist_cm) < 10):
+        while ((dist_cm) < 11):
             dist_cm = get_distance()
             print(dist_cm)
             motor_pair.start_tank(-10, -10)
@@ -572,13 +579,13 @@ def obstacle_detection():
         motor_pair.move_tank(1, 'cm', -10, -10)
         girar_num_grados_der(80)
         dist_cm = get_distance()
-        if (dist_cm > 30):
-            motor_pair.move_tank(2.5, 'cm', -25, 55)
+        if (dist_cm > 40):
+            motor_pair.move_tank(2.5, 'cm', -25, 65)
             hub.light_matrix.show_image('HEART')
             timer.reset()
             while (color_3 > 50): # Antes estaba en 45
                 color_3 = sen_3.get_reflected_light()
-                motor_pair.start_tank(28, 75)
+                motor_pair.start_tank(29, 75)
                 if (timer.now() > 4.5):
                     while (color_3 > 45):
                         color_3 = sen_3.get_reflected_light()
@@ -586,17 +593,25 @@ def obstacle_detection():
                         timer.reset()
             motor_pair.start_tank(0, 0)
             hub.light_matrix.show_image('DIAMOND')
-            motor_pair.move_tank(2, 'cm', 30, 30)
+            motor_pair.move_tank(2, 'cm', 60, 30)
             color_1 = sen_1.get_reflected_light()
+            hub.motion_sensor.reset_yaw_angle()
+            while (hub.motion_sensor.get_yaw_angle() < 50):
+                angle = hub.motion_sensor.get_yaw_angle()
+                print(angle)
+                motor_pair.start_tank(40, -35)
+            motor_pair.start_tank(0, 0)
             while color_1 > 30:
                 color_1 = sen_1.get_reflected_light()
                 motor_pair.start_tank(30, -30)
             motor_pair.start_tank(0, 0)
+            """hub.motion_sensor.reset_yaw_angle()
+            buscar_linea('izq')"""
             # find_line_after_obstacle('right')
         else:
             hub.light_matrix.show_image('ANGRY')
             hub.motion_sensor.reset_yaw_angle()
-            while (hub.motion_sensor.get_yaw_angle() > -159):
+            while (hub.motion_sensor.get_yaw_angle() > -160):
                 motor_pair.start_tank(-35, 40)
             motor_pair.start_tank(0, 0)
             hub.motion_sensor.reset_yaw_angle()
@@ -604,7 +619,7 @@ def obstacle_detection():
             timer.reset()
             while (color_3 > 50): # Antes estaba en 45
                 color_3 = sen_3.get_reflected_light()
-                motor_pair.start_tank(80, 28)
+                motor_pair.start_tank(80, 30)
                 if (timer.now() > 6):
                     while (color_3 > 45):
                         color_3 = sen_3.get_reflected_light()
