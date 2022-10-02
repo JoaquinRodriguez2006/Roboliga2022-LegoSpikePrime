@@ -607,8 +607,8 @@ def obstacle_detection():
             print(angle)
             motor_pair.start_tank(40, -35)
         motor_pair.start_tank(0, 0)
-        while color_1 > 20:
-            color_1 = sen_1.get_reflected_light()
+        while color_2 > 20:
+            color_2 = sen_2.get_reflected_light()
             motor_pair.start_tank(30, -30)
         motor_pair.start_tank(0, 0)
         """hub.motion_sensor.reset_yaw_angle()
