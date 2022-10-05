@@ -585,22 +585,22 @@ def obstacle_detection():
     if (dist_cm > 40):
         hub.light_matrix.show_image('HAPPY')
         girar_num_grados_der(35)
-        motor_pair.move_tank(3.5, 'cm', -24, 60)
-        motor_pair.move_tank(12, 'cm', 30, 75)
+        motor_pair.move_tank(3.5, 'cm', -22, 60) # Antes estaba en 24
+        motor_pair.move_tank(14, 'cm', 30, 75)
         hub.light_matrix.show_image('HEART')
         timer.reset()
-        while (color_2 > 25): # Antes estaba en 45
+        while (color_2 > 40): # Antes estaba en 45
             color_2 = sen_2.get_reflected_light()
             motor_pair.start_tank(29, 75)
             if (timer.now() > 1.6):
-                while (color_2 > 25):
+                while (color_2 > 40):
                     color_2 = sen_2.get_reflected_light()
                     motor_pair.start_tank(22, 75)
                     timer.reset()
         motor_pair.start_tank(0, 0)
         hub.light_matrix.show_image('DIAMOND')
         motor_pair.move_tank(6, 'cm', 60, 60)
-        color_1 = sen_1.get_reflected_light()
+        color_2 = sen_2.get_reflected_light()
         hub.motion_sensor.reset_yaw_angle()
         while (hub.motion_sensor.get_yaw_angle() < 45):
             angle = hub.motion_sensor.get_yaw_angle()
@@ -615,30 +615,37 @@ def obstacle_detection():
         buscar_linea('izq')"""
         # find_line_after_obstacle('right')
     else:
+        color_2 = sen_2.get_reflected_light()
         hub.light_matrix.show_image('ANGRY')
         hub.motion_sensor.reset_yaw_angle()
-        while (hub.motion_sensor.get_yaw_angle() > -160):
+        while (hub.motion_sensor.get_yaw_angle() > -109):
+            motor_pair.start_tank(-35, 40)
+        hub.motion_sensor.reset_yaw_angle()
+        motor_pair.start_tank(0, 0)
+        motor_pair.move_tank(3.5, 'cm', 60, 45)
+        motor_pair.move_tank(13, 'cm', 75, 38)
+        hub.light_matrix.show_image('HEART')
+        timer.reset()
+        color_2 = sen_2.get_reflected_light()
+        while (color_2 > 40): # Antes estaba en 45
+            color_2 = sen_2.get_reflected_light()
+            motor_pair.start_tank(80, 30)
+            if (timer.now() > 1.5):
+                while (color_2 > 40):
+                    color_2 = sen_2.get_reflected_light()
+                    motor_pair.start_tank(80, 20) # Antes eran 80/18
+                    timer.reset()
+        motor_pair.start_tank(0, 0)
+        color_2 = sen_2.get_reflected_light()
+        hub.motion_sensor.reset_yaw_angle()
+        while (hub.motion_sensor.get_yaw_angle() < 45):
             angle = hub.motion_sensor.get_yaw_angle()
             print(angle)
-            motor_pair.start_tank(-35, 40)
+            motor_pair.start_tank(40, -35)
         motor_pair.start_tank(0, 0)
-        hub.motion_sensor.reset_yaw_angle()
-        motor_pair.move_tank(3, 'cm', 60, 30)
-        timer.reset()
-        while (color_3 > 50): # Antes estaba en 45
-            color_3 = sen_3.get_reflected_light()
-            motor_pair.start_tank(80, 30)
-            if (timer.now() > 6):
-                while (color_3 > 45):
-                    color_3 = sen_3.get_reflected_light()
-                    motor_pair.start_tank(80, 20) # Antes eran 80/18
-        motor_pair.start_tank(0, 0)
-        hub.light_matrix.show_image('DIAMOND')
-        motor_pair.move_tank(3, 'cm', 30, 30)
-        color_1 = sen_1.get_reflected_light()
-        while color_1 > 30:
-            color_1 = sen_1.get_reflected_light()
-            motor_pair.start_tank(-30, 30)
+        while color_2 > 20:
+            color_2 = sen_2.get_reflected_light()
+            motor_pair.start_tank(30, -30)
         motor_pair.start_tank(0, 0)
     mostrar(nada)
 
