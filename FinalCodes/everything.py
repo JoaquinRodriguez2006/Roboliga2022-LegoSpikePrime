@@ -531,7 +531,7 @@ def buscar_linea(direccion):
     update()
     # motor_pair.move_tank(0.8,'cm',50,50)
     # if col_1 == 'green' or col_3 == 'green':
-    #     motor_pair.move_tank(2,'cm',50,50)
+    #    motor_pair.move_tank(2,'cm',50,50)
     # mostrar(nada,0)
 
 def loma_burro():
@@ -578,7 +578,7 @@ def obstacle_detection():
         dist_cm = get_distance()
     dist_cm = get_distance()
     color_2 = sen_2.get_reflected_light()
-    while ((dist_cm) < 9):
+    while ((dist_cm) < 10):
         dist_cm = get_distance()
         print(dist_cm)
         motor_pair.start_tank(-10, -10)
@@ -593,7 +593,7 @@ def obstacle_detection():
     while (color_2 > 17):
         color_2 = sen_2.get_reflected_light()
         motor_pair.start_tank(-20, 20)
-    motor_pair.start_tank(0, 0) 
+    motor_pair.start_tank(0, 0)
     girar_num_grados_der(45)
     dist_cm = get_distance()
     if (dist_cm > 20):
@@ -631,7 +631,7 @@ def obstacle_detection():
                 color_2 = sen_2.get_reflected_light()
                 motor_pair.start_tank(30, -30)
             motor_pair.start_tank(0, 0)
-            
+
         else:
             color_2 = sen_2.get_reflected_light()
             hub.light_matrix.show_image('ANGRY')
@@ -704,7 +704,7 @@ def obstacle_detection():
         motor_pair.start_tank(0, 0)"""
     mostrar(nada)
 
-#################################### Funciones de Rescate  #######################################
+#################################### Funciones de Rescate#######################################
 def normalize_degs(ang):
     ang = ang % 360
     if ang < 0:
@@ -914,7 +914,7 @@ while True:
     elif luz_1 < 30:
         error = (luz_1 / 20) - luz_3
     else:
-        error = luz_1 - luz_3 
+        error = luz_1 - luz_3
     proporcional = error
     integral = integral + error * 0.04
     derivada = (error - error_previo) / 0.04
@@ -922,7 +922,7 @@ while True:
     error_previo = error
     if sen_2.get_reflected_light() > 85:
         break
-    if dist_cm < 10:
+    if dist_cm < 7:
         obstacle_detection()
     else:
         if col_1 == 'green' or col_3 == 'green':
@@ -932,7 +932,7 @@ while True:
         elif luz_1 > 50 and luz_2 > 50 and luz_3 > 50:
             motor_pair.start_tank(50,50)
         # elif hub.motion_sensor.get_roll_angle() > 1 or hub.motion_sensor.get_roll_angle() < -1:
-        #     mostrar(equis)
+        #    mostrar(equis)
         #    loma_burro()
         else:
             if luz_1 < 17 or luz_3 < 17:
