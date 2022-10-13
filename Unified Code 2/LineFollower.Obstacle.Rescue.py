@@ -8,6 +8,10 @@ from math import *
 
 hub = PrimeHub()
 
+# Izquierda: 1
+# Medio: 2
+# Derecha: 3
+
 # global color_1
 # global color_2
 # global color_3
@@ -317,7 +321,7 @@ def giro_180_izq():
 def girar_num_grados_der(num):
     hub.motion_sensor.reset_yaw_angle()
     while (hub.motion_sensor.get_yaw_angle() < num):
-        motor_pair.start_tank(0, -35)
+        motor_pair.start_tank(90, -85)
     motor_pair.start_tank(0, 0)
     hub.motion_sensor.reset_yaw_angle()
 
@@ -633,9 +637,23 @@ def loma_burro():
     else:
         mostrar(equis)
 
-#######################################################################################################
-################################### OBSTACLE DETECTION AND AVOIDANCE ##################################
-#######################################################################################################
+def find_line_after_obstacle(direction):
+    luz_3 = sen_3.get_reflected_light()
+    luz_1 = sen_1.get_reflected_light()
+    if direction == 'right':
+        luz_3 = sen_3.get_reflected_light()
+        while (luz_3 < 45):
+            luz_3 = sen_3.get_reflected_light()
+            motor_pair.start_tank(-10, 10)
+        motor_pair.start_tank(0, 0)
+
+    elif direction == 'left':
+        luz_1 = sen_1.get_reflected_light()
+        while (luz_1 < 45):
+            luz_1 = sen_1.get_reflected_light()
+            motor_pair.start_tank(10, -10)
+        motor_pair.start_tank(0, 0)
+
 def obstacle_detection():
     global ant
     dist_cm = get_distance()
@@ -854,10 +872,8 @@ def obstacle_detection():
             motor_pair.move_tank(3, 'cm', 100, 100)
     mostrar(nada)
 
-#################################################################################################
-#################################### Funciones de Rescate #######################################
-#################################################################################################
 
+#################################### Funciones de Rescate #######################################
 def normalize_degs(ang):
     ang = ang % 360
     if ang < 0:
@@ -904,7 +920,10 @@ def measure_distance():
         return 10000000
     return dist
 
+
+
 initial_rotation = hub.motion_sensor.get_yaw_angle() + 180
+
 
 def get_rotation():
     global initial_rotation
@@ -1031,6 +1050,7 @@ def go_to_closest_wall():
     while measure_distance() > 5:
         pass
 
+
 def follow_wall_until_limit(wall, limit=5):
     if wall == "right":
         motor_pair.move(-4, steering=-80)
@@ -1055,7 +1075,9 @@ def move_to_corner(robot_position, corner, use_dist=True):
     corner_pos = [corner[0] * rectangle_dimensions[0], corner[1] * rectangle_dimensions[1]]
     return move_to(robot_position, corner_pos, use_dist)
 
-##############################################################
+########################################################################################################
+########################################################################################################
+
 while True:
     update()
     if luz_3 < 30:
@@ -1069,192 +1091,62 @@ while True:
     derivada = (error - error_previo) / 0.04
     salida = int(kp * proporcional + ki * integral + kd * derivada)
     error_previo = error
-    if sen_2.get_reflected_light() > 85:
+    if col_1 == 'plateado' or col_3 == 'plateado':
         break
-    if dist_cm < 10:
+    if dist_cm < 7:
         obstacle_detection()
     else:
+        update()
         if col_1 == 'green' or col_3 == 'green':
+            print('a')
             verifica_verde()
         elif luz_1 < 30 and luz_3 < 30:
             verifica_doble_negro()
         elif luz_1 > 50 and luz_2 > 50 and luz_3 > 50:
-            motor_pair.start_tank(50,50)
+            motor_pair.start_tank(90,90)
         # elif hub.motion_sensor.get_roll_angle() > 1 or hub.motion_sensor.get_roll_angle() < -1:
         #    mostrar(equis)
         #    loma_burro()
         else:
-            if luz_1 < 17 or luz_3 < 17:
+            if luz_1 < 26 or luz_3 < 26:
                 salida = int(4 * proporcional + ki * integral + kd * derivada)
                 motor_pair.start_tank(60 + salida, 60 - salida)
-            elif luz_1 < 24 or luz_3 < 24:
-                salida = int(3 * proporcional + ki * integral + kd * derivada)
-                motor_pair.start_tank(60 + salida, 60 - salida)
+            # elif luz_1 < 25 or luz_3 < 25:
+            #    salida = int(3 * proporcional + ki * integral + kd * derivada)
+            #    motor_pair.start_tank(75 + salida, 75 - salida)
             else:
-                salida = int(1.8 * proporcional + ki * integral + kd * derivada)
-                motor_pair.start_tank(60 + salida, 60 - salida)
+                salida = int(1.4 * proporcional + ki * integral + kd * derivada)
+                motor_pair.start_tank(90 + salida, 90 - salida)
+            mostrar(nada)
 
-# MOTORES
-motor_pair = MotorPair('A', 'C')
-motor_pair.set_motor_rotation(1.07 * math.pi, "cm")
+########################################################################################################################
+########################################################################################################################
 
-def do_wall_pass(alignment_angle, target_corner, rectangle_dimensions, wall_alignment="x", start_corner=(0, 0), sensor_forward=True, searching_step=10, stop_distance=10, init_start_distance=10):
-    global motor_pair
-
-    if wall_alignment == "y":
-        if start_corner[1] == 1:
-            turn_angle = alignment_angle - 90
-        elif start_corner[1] == 0:
-            turn_angle = alignment_angle - 90
-
-    elif wall_alignment == "x":
-        if start_corner[0] == 1:
-            turn_angle = alignment_angle - 90
-        elif start_corner[0] == 0:
-            turn_angle = alignment_angle - 90
-
-
-    if not sensor_forward:
-        turn_angle += 180
-
-    turn_angle = normalize_degs(turn_angle)
-
-    if sensor_forward:
-        if wall_alignment == "x":
-            start_distance = rectangle_dimensions[0] - init_start_distance
-        elif wall_alignment == "y":
-            start_distance = rectangle_dimensions[1] - init_start_distance
-
-        while True:
-            motor_pair.move(-5)
-            rotate_to_degs(turn_angle)
-            motor_pair.start(speed=100)
-            while True:
-                distance = measure_distance()
-                if distance > start_distance:
-                    break
-            motor_pair.stop()
-            motor_pair.start(speed=-100)
-            while True:
-                distance = measure_distance()
-                if distance < start_distance or distance < stop_distance:
-                    break
-            motor_pair.stop()
-
-            distance = measure_distance()
-            if wall_alignment == "x":
-                if start_corner == (0, 0):
-                    robot_position = [rectangle_dimensions[0] - distance, 10]
-                elif start_corner == (0, 1):
-                    robot_position = [rectangle_dimensions[0] - distance, rectangle_dimensions[1] - 10]
-                elif start_corner == (1, 1):
-                    robot_position = [distance, rectangle_dimensions[1] - 10]
-                elif start_corner == (1, 0):
-                    robot_position = [distance, 10]
-
-
-            else:
-                if start_corner == (0, 0):
-                    robot_position = [10, rectangle_dimensions[1] - distance]
-                elif start_corner == (0, 1):
-                    robot_position = [10, distance]
-                elif start_corner == (1, 1):
-                    robot_position = [rectangle_dimensions[0] - 10, distance]
-                elif start_corner == (1, 0):
-                    robot_position = [rectangle_dimensions[0] - 10, rectangle_dimensions[1] - distance]
-
-
-            if distance < stop_distance:
-                break
-            start_distance -= searching_step
-
-            move_to_corner(robot_position, target_corner, use_dist=False)
-            while sen_2.get_reflected_light() > 40:
-                pass
-
-            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
-            set_gyro_angle(alignment_angle)
-
-    else:
-        start_distance = init_start_distance
-        while True:
-            motor_pair.move(-5)
-            rotate_to_degs(turn_angle)
-            motor_pair.start(speed=-100)
-            while True:
-                distance = measure_distance()
-                if distance < start_distance:
-                    break
-            motor_pair.stop()
-            motor_pair.start(speed=100)
-            while True:
-                distance = measure_distance()
-                if wall_alignment == "x":
-                    if distance > start_distance or distance > rectangle_dimensions[0] - stop_distance:
-                        break
-                elif wall_alignment == "y":
-                    if distance > start_distance or distance > rectangle_dimensions[1] - stop_distance:
-                        break
-
-            motor_pair.stop()
-
-            distance = measure_distance()
-            if wall_alignment == "x":
-                if start_corner == (0, 0):
-                    robot_position = [distance, 10]
-                elif start_corner == (0, 1):
-                    robot_position = [distance, rectangle_dimensions[1] - 10]
-                elif start_corner == (1, 1):
-                    robot_position = [rectangle_dimensions[0] - distance, rectangle_dimensions[1] - 10]
-                elif start_corner == (1, 0):
-                    robot_position = [rectangle_dimensions[0] - distance, 10]
-
-
-            else:
-                if start_corner == (0, 0):
-                    robot_position = [10, distance]
-                elif start_corner == (0, 1):
-                    robot_position = [10, rectangle_dimensions[1] - distance]
-                elif start_corner == (1, 1):
-                    robot_position = [rectangle_dimensions[0] - 10, rectangle_dimensions[1] - distance]
-                elif start_corner == (1, 0):
-                    robot_position = [rectangle_dimensions[0] - 10, distance]
-
-
-            if (wall_alignment == "x" and distance > rectangle_dimensions[0] - stop_distance) or (wall_alignment == "y" and distance > rectangle_dimensions[1] - stop_distance):
-                break
-            start_distance += searching_step
-
-            move_to_corner(robot_position, target_corner, use_dist=False)
-            while sen_2.get_reflected_light() > 40:
-                pass
-
-            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
-            set_gyro_angle(alignment_angle)
 
 possible_corners = [(0, 0), (0, 1), (1, 1), (1, 0)]
 
-motor_pair.move(-30)
+motor_pair = MotorPair("A", "C")
+motor_pair.set_motor_rotation(1.07*pi)
+
+motor_pair.move(-30, speed=100)
 
 aligned_degs = align()
 
-#motor_pair.move(-30, speed=100)
+motor_pair.move(-30, speed=100)
 
-rectangle_dimensions = [120, 90]
-#rectangle_dimensions, robot_position = measure_and_locate()
+rectangle_dimensions, robot_position = measure_and_locate()
 
-#motor_pair.move(30, speed=100)
+motor_pair.move(30, speed=100)
 
 SEARCHING_STEP = 20
 
-STOP_DISTANCE = 20
 
 if aligned_degs == 270:
     rotate_to_degs(90)
     black_corner = None
     for corner in ((0, 1), (1, 1), (1, 0), (0, 0)):
         turn_corner("left")
-        follow_wall_until_limit("right", limit=10)
+        follow_wall_until_limit("right")
         if sen_2.get_reflected_light() < 40:
             hub.light_matrix.show_image('HAPPY')
             black_corner = corner
@@ -1265,18 +1157,28 @@ if aligned_degs == 270:
         motor_pair.move(max(rectangle_dimensions), speed=100)
         set_gyro_angle(270)
         robot_position = [10, rectangle_dimensions[1]]
+        start_distance = 20
 
         #FIRST WALL
-        do_wall_pass(
-            alignment_angle=270,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="y",
-            start_corner=(0, 1),
-            sensor_forward=False,
-            searching_step=20,
-            stop_distance=10,
-            init_start_distance=20)
+        while True:
+            motor_pair.move(-5)
+            rotate_to_degs(0)
+            motor_pair.start(speed=100)
+            while measure_distance() < start_distance:
+                pass
+            motor_pair.stop()
+
+            distance = measure_distance()
+            robot_position = [10, rectangle_dimensions[1] - distance]
+            if distance > rectangle_dimensions[1] - SEARCHING_STEP:
+                break
+            start_distance += SEARCHING_STEP
+
+            move_to_corner(robot_position, black_corner, use_dist=False)
+            while sen_2.get_reflected_light() > 40:
+                pass
+            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+            set_gyro_angle(270)
 
         motor_pair.move(-10)
         rotate_to_degs(270)
@@ -1292,16 +1194,25 @@ if aligned_degs == 270:
 
         #SECOND WALL
 
-        do_wall_pass(
-            alignment_angle=0,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="x",
-            start_corner=(0, 0),
-            sensor_forward=True,
-            searching_step=20,
-            stop_distance=10,
-            init_start_distance=40)
+        while True:
+            motor_pair.move(-5)
+            rotate_to_degs(270)
+            motor_pair.start(speed=-100)
+            while measure_distance() > start_distance:
+                pass
+            motor_pair.stop()
+
+            distance = measure_distance()
+            robot_position = [rectangle_dimensions[0] - distance, 0]
+            if distance < SEARCHING_STEP:
+                break
+            start_distance -= SEARCHING_STEP
+
+            move_to_corner(robot_position, black_corner, use_dist=False)
+            while sen_2.get_reflected_light() > 40:
+                pass
+            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+            set_gyro_angle(0)
 
         motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
         motor_pair.move(-5)
@@ -1309,24 +1220,38 @@ if aligned_degs == 270:
         motor_pair.move(-30)
 
 
+
+
     elif black_corner == (1, 0):
-        motor_pair.move(max(rectangle_dimensions), speed=100)
+        motor_pair.move(max(rectangle_dimensions), speed=50)
         set_gyro_angle(180)
         robot_position = [rectangle_dimensions[0], rectangle_dimensions[1]]
+        start_distance = rectangle_dimensions[0] - 20
 
         #FIRST WALL
-        do_wall_pass(
-            alignment_angle=180,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="x",
-            start_corner=(1, 1),
-            sensor_forward=True,
-            searching_step=20,
-            stop_distance=10,
-            init_start_distance=20)
+
+        while True:
+            motor_pair.move(-5)
+            rotate_to_degs(90)
+            motor_pair.start(speed=-100)
+            while measure_distance() > start_distance:
+                pass
+            motor_pair.stop()
+
+            distance = measure_distance()
+            robot_position = [distance , rectangle_dimensions[1] - 5]
+            if distance < SEARCHING_STEP:
+                break
+            start_distance -= SEARCHING_STEP
+
+            move_to_corner(robot_position, black_corner, use_dist=False)
+            while sen_2.get_reflected_light() > 40:
+                pass
+            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+            set_gyro_angle(180)
 
         robot_position = [0, rectangle_dimensions[1]]
+        start_distance = 20
 
         hub.speaker.beep(70, 1)
 
@@ -1337,16 +1262,25 @@ if aligned_degs == 270:
         set_gyro_angle(270)
 
         #SECOND WALL
-        do_wall_pass(
-            alignment_angle=270,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="y",
-            start_corner=(0, 1),
-            sensor_forward=False,
-            searching_step=20,
-            stop_distance=10,
-            init_start_distance=20)
+        while True:
+            motor_pair.move(-5)
+            rotate_to_degs(0)
+            motor_pair.start(speed=100)
+            while measure_distance() < start_distance:
+                pass
+            motor_pair.stop()
+
+            distance = measure_distance()
+            robot_position = [0, rectangle_dimensions[1] - distance]
+            if distance > rectangle_dimensions[1] - SEARCHING_STEP:
+                break
+            start_distance += SEARCHING_STEP
+
+            move_to_corner(robot_position, black_corner, use_dist=False)
+            while sen_2.get_reflected_light() > 40:
+                pass
+            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+            set_gyro_angle(270)
 
         motor_pair.move(40)
 
@@ -1371,19 +1305,36 @@ if aligned_degs == 270:
         set_gyro_angle(0)
 
         robot_position = [30, 10]
+        start_distance = rectangle_dimensions[0] - 30
 
         #FIRST WALL
-        do_wall_pass(
-            alignment_angle=0,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="x",
-            start_corner=(0, 0),
-            sensor_forward=True,
-            searching_step=20,
-            stop_distance=15,
-            init_start_distance=40)
 
+        while True:
+            motor_pair.move(-5)
+            rotate_to_degs(270)
+            motor_pair.start(speed=100)
+            while measure_distance() < start_distance:
+                pass
+            motor_pair.start(speed=-100)
+            while measure_distance() > start_distance:
+                pass
+            motor_pair.stop()
+
+            distance = measure_distance()
+            robot_position = [rectangle_dimensions[0] - distance, 0]
+            if distance < SEARCHING_STEP:
+                break
+            start_distance -= SEARCHING_STEP
+            if start_distance < 0:
+                break
+
+            move_to_corner(robot_position, black_corner, use_dist=False)
+            while sen_2.get_reflected_light() > 40:
+                pass
+            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+            set_gyro_angle(0)
+
+        start_distance = rectangle_dimensions[1] - 20
         rotate_to_degs(0)
         motor_pair.move(20)
         set_gyro_angle(0)
@@ -1393,16 +1344,31 @@ if aligned_degs == 270:
         set_gyro_angle(90)
 
         #SECOND WALL
-        do_wall_pass(
-            alignment_angle=90,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="y",
-            start_corner=(1, 0),
-            sensor_forward=True,
-            searching_step=20,
-            stop_distance=15,
-            init_start_distance=20)
+        while True:
+            motor_pair.move(-5)
+            rotate_to_degs(0)
+            motor_pair.start(speed=100)
+            while measure_distance() < start_distance:
+                pass
+
+            motor_pair.start(speed=-100)
+            while measure_distance() > start_distance:
+                pass
+            motor_pair.stop()
+
+            distance = measure_distance()
+            robot_position = [rectangle_dimensions[0] - 5, rectangle_dimensions[1] - distance]
+            if distance < SEARCHING_STEP:
+                break
+            start_distance -= SEARCHING_STEP
+            if start_distance < 0:
+                break
+
+            move_to_corner(robot_position, black_corner, use_dist=False)
+            while sen_2.get_reflected_light() > 40:
+                pass
+            motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+            set_gyro_angle(90)
 
         move_to_corner(robot_position, (0, 0))
         rotate_to_degs(180)
@@ -1410,7 +1376,7 @@ if aligned_degs == 270:
 
 elif aligned_degs == 90:
     rotate_to_degs(270)
-    black_corner = None
+    black_corner = 0
     for corner in ((1, 1), (0, 1), (0, 0), (1, 0)):
         turn_corner("right")
         follow_wall_until_limit("left")
@@ -1418,50 +1384,4 @@ elif aligned_degs == 90:
             hub.light_matrix.show_image('HAPPY')
             black_corner = corner
     rotate_to_degs(0)
-
-
-    if black_corner == (1, 1):
-        pass
-
-
-    elif black_corner == (1, 0):
-        pass
-
-
-
-    elif black_corner == (0, 1):
-        motor_pair.move(max(rectangle_dimensions), speed=100)
-        set_gyro_angle(90)
-        robot_position = [rectangle_dimensions[0], rectangle_dimensions[1]]
-
-        #FIRST WALL
-        do_wall_pass(
-            alignment_angle=90,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="y",
-            start_corner=(1, 1),
-            sensor_forward=False,
-            searching_step=20,
-            stop_distance=15,
-            init_start_distance=20)
-
-        rotate_to_degs(90)
-        motor_pair.move(20)
-        set_gyro_angle(90)
-        motor_pair.move(-40)
-        rotate_to_degs(0)
-        motor_pair.move(15)
-        set_gyro_angle(0)
-
-        #SECOND WALL
-        do_wall_pass(
-            alignment_angle=0,
-            target_corner=black_corner,
-            rectangle_dimensions=rectangle_dimensions,
-            wall_alignment="x",
-            start_corner=(1, 0),
-            sensor_forward=True,
-            searching_step=20,
-            stop_distance=15,
-            init_start_distance=40)
+    align()
