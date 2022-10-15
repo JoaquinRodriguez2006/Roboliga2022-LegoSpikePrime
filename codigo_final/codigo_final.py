@@ -364,7 +364,7 @@ def verifica_l_giro():
     elif luz_3 < 40 or luz_1 < 40:
         # print('capaz',r1,g1,b1,'    ',r3,g3,b3)
         # motor_pair.move_tank(2.5,'cm',-80,-80)
-        motor_pair.move_tank(2,'cm',-80,-80)
+        motor_pair.move_tank(1.8,'cm',-80,-80)
         posible_verde()
         motor_pair.start_tank(0,0)
         if col_1 == 'green' or col_3 == 'green':
@@ -373,7 +373,7 @@ def verifica_l_giro():
             verifica_verde()
         else:
             wait_for_seconds(0.1)
-            motor_pair.move_tank(2,'cm',80,80)
+            motor_pair.move_tank(1,8,'cm',80,80)
             # motor_pair.move_tank(0.7,'cm',-80,-80)
             # wait_for_seconds(0.1)
             hub.motion_sensor.reset_yaw_angle()
@@ -397,7 +397,7 @@ def verifica_l_giro():
             # mostrar(nada)
             if manzana == 0:
                 hub.motion_sensor.reset_yaw_angle()
-                while hub.motion_sensor.get_yaw_angle() < 29:
+                while hub.motion_sensor.get_yaw_angle() < 31:
                     motor_pair.start_tank(80,-80)
                 # motor_pair.move_tank(0,'cm',0,0)
                 # motor_pair.move_tank(0.5,'cm',80,-80)
@@ -407,7 +407,7 @@ def verifica_l_giro():
                 update()
                 if luz_2 > 1:
                     hub.motion_sensor.reset_yaw_angle()
-                    while (hub.motion_sensor.get_yaw_angle() < 29):
+                    while (hub.motion_sensor.get_yaw_angle() < 31):
                         update()
                         motor_pair.start_tank(80,-80)
                         if luz_2 < 35:
@@ -427,7 +427,7 @@ def verifica_l_giro():
                     # mostrar(nada)
                     if manzana == 0:
                         hub.motion_sensor.reset_yaw_angle()
-                        while hub.motion_sensor.get_yaw_angle() > -29:
+                        while hub.motion_sensor.get_yaw_angle() > -31:
                             motor_pair.start_tank(-80,80)
                         motor_pair.move_tank(1,'cm',-80,-80)
                         update()
@@ -522,7 +522,7 @@ def verifica_verde():
                 giro_90_der()
                 # motor_pair.move_tank(2,'cm',30,30)
                 buscar_linea('der')
-                motor_pair.move_tank(2.5,'cm',80,50)
+                motor_pair.move_tank(2.8,'cm',80,50)
                 update()
                 if luz_2 > 40:
                     motor_pair.move_tank(0.8,'cm',-80,-80)
@@ -553,7 +553,7 @@ def verifica_verde():
                 giro_90_izq()
                 # motor_pair.move_tank(2,'cm',30,30)
                 buscar_linea('izq')
-                motor_pair.move_tank(2.5,'cm',50,80)
+                motor_pair.move_tank(2.8,'cm',50,80)
                 update()
                 if luz_2 > 40:
                     motor_pair.move_tank(0.8,'cm',-50,-50)
@@ -1121,7 +1121,7 @@ while True:
                 salida = int(7 * proporcional + ki * integral + kd * derivada)
                 motor_pair.start_tank(50 + salida,50 - salida)
             elif luz_3 < 40 or luz_1 < 40:
-                salida = int(3 * proporcional + ki * integral + kd * derivada)
+                salida = int(3.2 * proporcional + ki * integral + kd * derivada)
                 motor_pair.start_tank(70 + salida,70 - salida)
             else:
                 salida = int(3 * proporcional + ki * integral + kd * derivada)
