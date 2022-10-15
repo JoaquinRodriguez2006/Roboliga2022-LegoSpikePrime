@@ -1421,8 +1421,8 @@ if aligned_degs == 270:
 elif aligned_degs == 90:
     rotate_to_degs(270)
     black_corner = None
-    for corner in ((1, 1), (0, 1), (0, 0), (1, 0)):
-        turn_corner("right")
+    for corner, direction in zip(((0, 1), (1, 1), (1, 0), (0, 0)), (0, 90, 180, 270)):
+        rotate_to_degs(normalize_degs(direction - 20))
         follow_wall_until_limit("left", limit=10)
         if sen_2.get_reflected_light() < 40:
             hub.light_matrix.show_image('HAPPY')
@@ -1431,7 +1431,6 @@ elif aligned_degs == 90:
 
 
     if black_corner == (1, 1):
-
         motor_pair.start(speed=100)
         while measure_distance() < rectangle_dimensions[1] - SEARCHING_STEP:
             pass
