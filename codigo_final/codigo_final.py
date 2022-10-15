@@ -708,7 +708,7 @@ def obstacle_detection():
                             motor_pair.start_tank(100, 23) # Antes eran 80/18
                             timer.reset()
                 motor_pair.start_tank(0, 0)
-                motor_pair.move_tank(6, 'cm', 100, 100)
+                motor_pair.move_tank(4, 'cm', 100, 100)
                 color_2 = sen_2.get_reflected_light()
                 while color_2 > 20:
                     color_2 = sen_2.get_reflected_light()
@@ -738,7 +738,7 @@ def obstacle_detection():
                         motor_pair.start_tank(100, 20) # Antes eran 80/18
                         timer.reset()
             motor_pair.start_tank(0, 0)
-            motor_pair.move_tank(6, 'cm', 100, 100)
+            motor_pair.move_tank(4, 'cm', 100, 100)
             color_2 = sen_2.get_reflected_light()
             while color_2 > 20:
                 color_2 = sen_2.get_reflected_light()
@@ -809,7 +809,7 @@ def obstacle_detection():
                             timer.reset()
                 motor_pair.start_tank(0, 0)
                 hub.light_matrix.show_image('DIAMOND')
-                motor_pair.move_tank(6, 'cm', 100, 100)
+                motor_pair.move_tank(4, 'cm', 100, 100)
                 color_2 = sen_2.get_reflected_light()
                 while color_2 > 20:
                     color_2 = sen_2.get_reflected_light()
@@ -842,7 +842,7 @@ def obstacle_detection():
                         timer.reset()
             motor_pair.start_tank(0, 0)
             hub.light_matrix.show_image('DIAMOND')
-            motor_pair.move_tank(6, 'cm', 100, 100)
+            motor_pair.move_tank(4, 'cm', 100, 100)
             color_2 = sen_2.get_reflected_light()
             while color_2 > 20:
                 color_2 = sen_2.get_reflected_light()
