@@ -373,7 +373,7 @@ def verifica_l_giro():
             verifica_verde()
         else:
             wait_for_seconds(0.1)
-            motor_pair.move_tank(1,8,'cm',80,80)
+            motor_pair.move_tank(1.8,'cm',80,80)
             # motor_pair.move_tank(0.7,'cm',-80,-80)
             # wait_for_seconds(0.1)
             hub.motion_sensor.reset_yaw_angle()
