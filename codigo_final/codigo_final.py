@@ -317,7 +317,7 @@ def giro_180_izq():
 def girar_num_grados_der(num):
     hub.motion_sensor.reset_yaw_angle()
     while (hub.motion_sensor.get_yaw_angle() < num):
-        motor_pair.start_tank(40, -35)
+        motor_pair.start_tank(90, -85)
     motor_pair.start_tank(0, 0)
     hub.motion_sensor.reset_yaw_angle()
 
