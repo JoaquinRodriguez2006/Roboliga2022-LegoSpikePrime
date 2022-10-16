@@ -879,7 +879,6 @@ def get_distance_from_coords(position):
 
 # hub = PrimeHub()
 
-rectangle_dimensions = [0, 0]
 
 
 """
@@ -1241,7 +1240,7 @@ def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimension
         rotate_to_degs(ang)
 
         #motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
-        motor_pair.move(dist - 30)
+        motor_pair.move(dist - 30, speed=100)
         rotate_to_degs(alignment_angle)
 
         motor_pair.move(5)
@@ -1385,14 +1384,14 @@ if aligned_degs == 270:
         #FIRST WALL
         do_wall_pass(
             alignment_angle=0,
-            turn_angle=270,
+            turn_angle=90,
             target_corner=black_corner,
             rectangle_dimensions=rectangle_dimensions,
             wall_alignment="x",
             start_corner=(0, 0),
-            sensor_forward=True,
+            sensor_forward=False,
             searching_step=20,
-            stop_distance=15,
+            stop_distance=20,
             init_start_distance=40)
 
         rotate_to_degs(90)
@@ -1419,10 +1418,9 @@ if aligned_degs == 270:
 
 
 elif aligned_degs == 90:
-    rotate_to_degs(270)
     black_corner = None
-    for corner in ((1, 1), (0, 1), (0, 0), (1, 0)):
-        turn_corner("right")
+    for corner, direction in zip(((1, 1), (0, 1), (0, 0), (1, 0)), (0, 90, 180, 270)):
+        rotate_to_degs(normalize_degs(direction - 20))
         follow_wall_until_limit("left", limit=10)
         if sen_2.get_reflected_light() < 40:
             hub.light_matrix.show_image('HAPPY')
@@ -1431,7 +1429,6 @@ elif aligned_degs == 90:
 
 
     if black_corner == (1, 1):
-
         motor_pair.start(speed=100)
         while measure_distance() < rectangle_dimensions[1] - SEARCHING_STEP:
             pass
