@@ -757,7 +757,7 @@ def obstacle_detection():
         if (dist_cm > 20):
             hub.light_matrix.show_image('HAPPY')
             hub.motion_sensor.reset_yaw_angle()
-            while (hub.motion_sensor.get_yaw_angle() > -35):
+            while (hub.motion_sensor.get_yaw_angle() > -30):
                 motor_pair.start_tank(-95, 100)
             hub.motion_sensor.reset_yaw_angle()
             dist_cm = get_distance()
