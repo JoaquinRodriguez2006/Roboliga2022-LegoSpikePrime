@@ -1151,9 +1151,9 @@ def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimension
 
     while True:
         rotate_to_degs(turn_angle)
-        motor_pair.start(speed=100)
 
         if sensor_forward:
+            motor_pair.start(speed=100)
             while True:
                 distance = measure_distance()
                 if distance > start_distance:
@@ -1191,6 +1191,7 @@ def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimension
             start_distance -= searching_step
 
         else:
+            motor_pair.start(speed=-100)
             while True:
                 distance = measure_distance()
                 if distance < start_distance:
@@ -1430,7 +1431,7 @@ elif aligned_degs == 90:
 
     if black_corner == (1, 1):
         motor_pair.start(speed=100)
-        while measure_distance() < rectangle_dimensions[1] - SEARCHING_STEP:
+        while measure_distance() < rectangle_dimensions[1] - 10:
             pass
         motor_pair.stop()
         rotate_to_degs(90)
@@ -1442,15 +1443,15 @@ elif aligned_degs == 90:
         #FIRST WALL
         do_wall_pass(
             alignment_angle=0,
-            turn_angle=90,
+            turn_angle=270,
             target_corner=black_corner,
             rectangle_dimensions=rectangle_dimensions,
             wall_alignment="x",
             start_corner=(1, 0),
-            sensor_forward=True,
+            sensor_forward=False,
             searching_step=20,
-            stop_distance=15,
-            init_start_distance=40)
+            stop_distance=20,
+            init_start_distance=30)
 
         rotate_to_degs(0)
         motor_pair.move(15)
@@ -1470,7 +1471,7 @@ elif aligned_degs == 90:
             start_corner=(0, 0),
             sensor_forward=True,
             searching_step=20,
-            stop_distance=15,
+            stop_distance=10,
             init_start_distance=20)
 
 
@@ -1547,3 +1548,5 @@ elif aligned_degs == 90:
             searching_step=20,
             stop_distance=15,
             init_start_distance=20)
+        
+        motor_pair.move(20)
