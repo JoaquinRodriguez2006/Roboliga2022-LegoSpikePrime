@@ -879,7 +879,6 @@ def get_distance_from_coords(position):
 
 # hub = PrimeHub()
 
-rectangle_dimensions = [0, 0]
 
 
 """
@@ -1241,7 +1240,7 @@ def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimension
         rotate_to_degs(ang)
 
         #motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
-        motor_pair.move(dist - 30)
+        motor_pair.move(dist - 30, speed=100)
         rotate_to_degs(alignment_angle)
 
         motor_pair.move(5)
@@ -1419,9 +1418,8 @@ if aligned_degs == 270:
 
 
 elif aligned_degs == 90:
-    rotate_to_degs(270)
     black_corner = None
-    for corner, direction in zip(((0, 1), (1, 1), (1, 0), (0, 0)), (0, 90, 180, 270)):
+    for corner, direction in zip(((1, 1), (0, 1), (0, 0), (1, 0)), (0, 90, 180, 270)):
         rotate_to_degs(normalize_degs(direction - 20))
         follow_wall_until_limit("left", limit=10)
         if sen_2.get_reflected_light() < 40:
