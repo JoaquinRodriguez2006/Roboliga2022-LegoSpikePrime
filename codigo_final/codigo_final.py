@@ -364,7 +364,7 @@ def verifica_l_giro():
     elif luz_3 < 40 or luz_1 < 40:
         # print('capaz',r1,g1,b1,'    ',r3,g3,b3)
         # motor_pair.move_tank(2.5,'cm',-80,-80)
-        motor_pair.move_tank(1.8,'cm',-80,-80)
+        motor_pair.move_tank(1.5,'cm',-80,-80)
         posible_verde()
         motor_pair.start_tank(0,0)
         if col_1 == 'green' or col_3 == 'green':
@@ -373,14 +373,14 @@ def verifica_l_giro():
             verifica_verde()
         else:
             wait_for_seconds(0.1)
-            motor_pair.move_tank(1.8,'cm',80,80)
+            motor_pair.move_tank(1.4,'cm',80,80)
             # motor_pair.move_tank(0.7,'cm',-80,-80)
             # wait_for_seconds(0.1)
             hub.motion_sensor.reset_yaw_angle()
             while (hub.motion_sensor.get_yaw_angle() > -32):
                 update()
                 motor_pair.start_tank(-80,80)
-                if luz_2 < 35:
+                if luz_2 < 30:
                     motor_pair.start_tank(0,0)
                     mostrar(l_der)
                     # motor_pair.move_tank(2.5,'cm',30,30)
@@ -410,7 +410,7 @@ def verifica_l_giro():
                     while (hub.motion_sensor.get_yaw_angle() < 31):
                         update()
                         motor_pair.start_tank(80,-80)
-                        if luz_2 < 35:
+                        if luz_2 < 30:
                             motor_pair.start_tank(0,0)
                             mostrar(l_izq)
                             # motor_pair.move_tank(2.5,'cm',30,30)
@@ -432,13 +432,13 @@ def verifica_l_giro():
                         motor_pair.move_tank(1,'cm',-80,-80)
                         update()
                         correccion = luz_1 - luz_3
-                        correccion = int(correccion * 1.7)
-                        motor_pair.move_tank(1.5,'cm',-45 + correccion,-45 - correccion)
+                        correccion = int(correccion * 1.95)
+                        motor_pair.move_tank(2,'cm',-45 + correccion,-45 - correccion)
                         # motor_pair.move_tank(2,'cm',-30,-30)
                         if correccion < 0:
-                            motor_pair.move_tank(1,'cm',-80,80)
+                            motor_pair.move_tank(0.5,'cm',-80,80)
                         else:
-                            motor_pair.move_tank(1,'cm',80,-80)
+                            motor_pair.move_tank(0.5,'cm',80,-80)
                 else:
                     motor_pair.move_tank(1,'cm',-50,-50)
                     update()
@@ -577,7 +577,7 @@ def buscar_linea(direccion):
     motor_pair.start_tank(0,0)
     mostrar(buscar)
     if direccion == 'der':
-        motor_pair.move_tank(0.5,'cm',80,0)
+        motor_pair.move_tank(0.8,'cm',80,0)
         while luz_1 > 23 and luz_2 > 23:
             update()
             motor_pair.start_tank(80,-80)
@@ -592,7 +592,7 @@ def buscar_linea(direccion):
                 motor_pair.start_tank(-80,80)
             # motor_pair.move_tank(0.7,'cm',-80,80)
     elif direccion == 'izq':
-        motor_pair.move_tank(0.5,'cm',0,80)
+        motor_pair.move_tank(0.8,'cm',0,80)
         while luz_3 > 23 and luz_2 > 23:
             update()
             motor_pair.start_tank(-80,80)
