@@ -1240,7 +1240,6 @@ def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimension
 
         rotate_to_degs(ang)
 
-        #motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
         motor_pair.move(dist - 30 + margin, speed=100)
         rotate_to_degs(alignment_angle)
 
@@ -1383,13 +1382,10 @@ if aligned_degs == 270:
 
         motor_pair.move(40)
 
-
-
     elif black_corner == (0, 1):
         rotate_to_degs(0)
-
         motor_pair.start(speed=100)
-        while measure_distance() < rectangle_dimensions[1] - SEARCHING_STEP:
+        while measure_distance() < rectangle_dimensions[1] - (SEARCHING_STEP + 5):
             pass
         motor_pair.stop()
         rotate_to_degs(270)
@@ -1397,8 +1393,6 @@ if aligned_degs == 270:
         rotate_to_degs(0)
         motor_pair.move(15)
         set_gyro_angle(0)
-
-        robot_position = [30, 10]
 
         #FIRST WALL
         do_wall_pass(
@@ -1412,7 +1406,7 @@ if aligned_degs == 270:
             searching_step=20,
             stop_distance=20,
             init_start_distance=40)
-
+        
         rotate_to_degs(90)
         motor_pair.move(20)
         set_gyro_angle(90)
@@ -1430,11 +1424,12 @@ if aligned_degs == 270:
             stop_distance=15,
             init_start_distance=20)
 
+        
         robot_position = [rectangle_dimensions[0], rectangle_dimensions[1] - 15]
         move_to_corner(robot_position, (0, 0))
         rotate_to_degs(180)
         motor_pair.move(-30)
-
+        
 
 elif aligned_degs == 90:
     black_corner = None
