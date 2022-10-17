@@ -1133,10 +1133,10 @@ while True:
 motor_pair = MotorPair('A', 'C')
 motor_pair.set_motor_rotation(1.07 * math.pi, "cm")
 
-def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimensions, wall_alignment="x", start_corner=(0, 0), sensor_forward=True, searching_step=10, stop_distance=10, init_start_distance=10):
+def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimensions, wall_alignment="x", start_corner=(0, 0), sensor_forward=True, searching_step=10, stop_distance=10, init_start_distance=10, last_pass=True):
     global motor_pair
 
-    margin = 0
+    margin = 5
 
     turn_angle = normalize_degs(turn_angle)
 
@@ -1241,12 +1241,28 @@ def do_wall_pass(alignment_angle, turn_angle, target_corner, rectangle_dimension
         rotate_to_degs(ang)
 
         #motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
-        motor_pair.move(dist - 30, speed=100)
+        motor_pair.move(dist - 30 + margin, speed=100)
         rotate_to_degs(alignment_angle)
 
         motor_pair.move(5)
 
         set_gyro_angle(alignment_angle)
+
+    if last_pass:
+        ang, dist = move_to_corner(robot_position, target_corner, use_dist=False)
+        while sen_2.get_reflected_light() > 40:
+            pass
+
+        rotate_to_degs(ang)
+
+        #motor_pair.move(max(rectangle_dimensions) + 20, speed=100)
+        motor_pair.move(dist - 30 + margin, speed=100)
+        rotate_to_degs(alignment_angle)
+
+        motor_pair.move(5)
+
+        set_gyro_angle(alignment_angle)
+    
 
 
 
@@ -1268,11 +1284,10 @@ SEARCHING_STEP = 20
 STOP_DISTANCE = 20
 
 if aligned_degs == 270:
-    #rotate_to_degs(90)
     black_corner = None
     for corner, direction in zip(((0, 1), (1, 1), (1, 0), (0, 0)), (0, 270, 180, 90)):
         rotate_to_degs(normalize_degs(direction + 20))
-        follow_wall_until_limit("right", limit=10)
+        follow_wall_until_limit("right", limit=8)
         if sen_2.get_reflected_light() < 40:
             hub.light_matrix.show_image('HAPPY')
             black_corner = corner
@@ -1294,7 +1309,8 @@ if aligned_degs == 270:
             sensor_forward=False,
             searching_step=20,
             stop_distance=20,
-            init_start_distance=20)
+            init_start_distance=20,
+            last_pass=False)
 
         rotate_to_degs(270)
         motor_pair.move(-30)
@@ -1317,6 +1333,7 @@ if aligned_degs == 270:
             stop_distance=10,
             init_start_distance=40)
 
+        rotate_to_degs(270)
         motor_pair.move(rectangle_dimensions[0], speed=100)
         motor_pair.move(-5)
         rotate_to_degs(180)
@@ -1360,8 +1377,9 @@ if aligned_degs == 270:
             start_corner=(0, 1),
             sensor_forward=False,
             searching_step=20,
-            stop_distance=10,
-            init_start_distance=20)
+            stop_distance=20,
+            init_start_distance=20,
+            last_pass=False)
 
         motor_pair.move(40)
 
@@ -1422,7 +1440,7 @@ elif aligned_degs == 90:
     black_corner = None
     for corner, direction in zip(((1, 1), (0, 1), (0, 0), (1, 0)), (0, 90, 180, 270)):
         rotate_to_degs(normalize_degs(direction - 20))
-        follow_wall_until_limit("left", limit=10)
+        follow_wall_until_limit("left", limit=8)
         if sen_2.get_reflected_light() < 40:
             hub.light_matrix.show_image('HAPPY')
             black_corner = corner
@@ -1431,7 +1449,7 @@ elif aligned_degs == 90:
 
     if black_corner == (1, 1):
         motor_pair.start(speed=100)
-        while measure_distance() < rectangle_dimensions[1] - 10:
+        while measure_distance() < rectangle_dimensions[1] - SEARCHING_STEP:
             pass
         motor_pair.stop()
         rotate_to_degs(90)
@@ -1490,8 +1508,9 @@ elif aligned_degs == 90:
             start_corner=(1, 1),
             sensor_forward=False,
             searching_step=20,
-            stop_distance=15,
-            init_start_distance=20)
+            stop_distance=20,
+            init_start_distance=20,
+            last_pass=False)
 
         rotate_to_degs(90)
         motor_pair.move(20)
@@ -1511,7 +1530,7 @@ elif aligned_degs == 90:
             start_corner=(1, 0),
             sensor_forward=True,
             searching_step=20,
-            stop_distance=15,
+            stop_distance=10,
             init_start_distance=40)
 
     elif black_corner == (0, 0):
@@ -1546,7 +1565,8 @@ elif aligned_degs == 90:
             start_corner=(1, 1),
             sensor_forward=False,
             searching_step=20,
-            stop_distance=15,
-            init_start_distance=20)
-        
+            stop_distance=20,
+            init_start_distance=20,
+            last_pass=False)
+
         motor_pair.move(20)
